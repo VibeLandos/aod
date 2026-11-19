@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">AOD Keep Screen</string>
+    <string name="tile_label">Keep Screen On</string>
+    <string name="tile_description">Toggle screen awake mode</string>
+    <string name="notification_channel_name">Keep Screen Active</string>
+    <string name="notification_channel_desc">Notifications while screen is being kept awake</string>
+    <string name="notification_title">Screen is kept awake</string>
+    <string name="notification_text">Tap to open controls or turn off</string>
+    <string name="action_stop">Turn Off</string>
+</resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- MD3 Palette Tokens -->
+    <color name="md_theme_light_primary">#006495</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_primaryContainer">#CBE6FF</color>
+    <color name="md_theme_light_onPrimaryContainer">#001E30</color>
+    <color name="md_theme_light_background">#FCFCFF</color>
+    <color name="md_theme_light_onBackground">#191C1E</color>
+
+    <color name="md_theme_dark_primary">#8FCDFF</color>
+    <color name="md_theme_dark_onPrimary">#003450</color>
+    <color name="md_theme_dark_primaryContainer">#004B72</color>
+    <color name="md_theme_dark_onPrimaryContainer">#CBE6FF</color>
+    <color name="md_theme_dark_background">#111416</color>
+    <color name="md_theme_dark_onBackground">#E1E2E5</color>
+
+    <!-- AMOLED Pitch Black for AOD -->
+    <color name="amoled_black">#000000</color>
+    <color name="amoled_dim_text">#8A929A</color>
+    <color name="amoled_accent">#64B5F6</color>
+</resources>

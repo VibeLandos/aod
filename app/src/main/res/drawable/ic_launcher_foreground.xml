@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#006495"
+        android:pathData="M30,20h48c5.52,0 10,4.48 10,10v48c0,5.52 -4.48,10 -10,10H30c-5.52,0 -10,-4.48 -10,-10V30c0,-5.52 4.48,-10 10,-10z"/>
+    <!-- Phone with glowing screen center -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,34c-9.94,0 -18,8.06 -18,18s8.06,18 18,18 18,-8.06 18,-18 -8.06,-18 -18,-18zm0,30c-6.63,0 -12,-5.37 -12,-12s5.37,-12 12,-12 12,5.37 12,12 -5.37,12 -12,12z"/>
+    <path
+        android:fillColor="#8FCDFF"
+        android:pathData="M54,44c-4.41,0 -8,3.59 -8,8s3.59,8 8,8 8,-3.59 8,-8 -3.59,-8 -8,-8z"/>
+</vector>
