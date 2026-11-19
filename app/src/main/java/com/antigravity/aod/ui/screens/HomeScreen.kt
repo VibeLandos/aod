@@ -263,7 +263,7 @@ fun HomeScreen(
                 }
             }
 
-            // Bottom Inset Card (matches ryNet okak69-Chain item)
+            // Bottom Inset Card (quick mode navigation)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
