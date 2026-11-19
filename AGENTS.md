@@ -31,7 +31,9 @@ android-apps/aod/
 │       ├── java/com/antigravity/aod/
 │       │   ├── MainActivity.kt            # App entry point, immersive full-screen handler
 │       │   ├── data/
-│       │   │   └── AodPreferences.kt      # Persistent settings (WakeLock, AMOLED, timeouts)
+│       │   │   └── AodPreferences.kt      # Persistent settings (WakeLock, AMOLED, timeouts, GitHub config)
+│       │   ├── updater/
+│       │   │   └── UpdateManager.kt       # GitHub API release checker, APK downloader, FileProvider installer
 │       │   ├── service/
 │       │   │   ├── KeepScreenService.kt   # Foreground service with WakeLock & notifications
 │       │   │   └── KeepScreenTileService.kt # Android Quick Settings Tile (1-tap toggle)

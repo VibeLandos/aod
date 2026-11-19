@@ -11,6 +11,9 @@ import androidx.lifecycle.viewModelScope
 import com.antigravity.aod.data.AodPreferences
 import com.antigravity.aod.data.AodSettings
 import com.antigravity.aod.service.KeepScreenService
+import com.antigravity.aod.updater.GithubRelease
+import com.antigravity.aod.updater.UpdateManager
+import com.antigravity.aod.updater.UpdateState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +28,9 @@ class AodViewModel(application: Application) : AndroidViewModel(application) {
 
     private val prefs = AodPreferences.getInstance(application)
     val settings: StateFlow<AodSettings> = prefs.settingsFlow
+
+    val updateManager = UpdateManager(application)
+    val updateState: StateFlow<UpdateState> = updateManager.updateState
 
     private val _batteryInfo = MutableStateFlow(BatteryInfo())
     val batteryInfo: StateFlow<BatteryInfo> = _batteryInfo.asStateFlow()
@@ -94,6 +100,34 @@ class AodViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setShowOnLockScreen(enabled: Boolean) {
         prefs.setShowOnLockScreen(enabled)
+    }
+
+    fun setGithubToken(token: String) {
+        prefs.setGithubToken(token)
+    }
+
+    fun setGithubRepo(repo: String) {
+        prefs.setGithubRepo(repo)
+    }
+
+    fun checkForUpdates(currentVersion: String) {
+        viewModelScope.launch {
+            updateManager.checkForUpdates(currentVersion)
+        }
+    }
+
+    fun downloadAndInstall(release: GithubRelease) {
+        viewModelScope.launch {
+            updateManager.downloadAndInstall(release)
+        }
+    }
+
+    fun installApk(file: java.io.File) {
+        updateManager.installApk(file)
+    }
+
+    fun resetUpdateState() {
+        updateManager.resetState()
     }
 
     override fun onCleared() {

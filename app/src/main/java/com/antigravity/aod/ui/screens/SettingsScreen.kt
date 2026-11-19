@@ -18,17 +18,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material.icons.rounded.BatteryChargingFull
 import androidx.compose.material.icons.rounded.BrightnessMedium
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material.icons.rounded.Widgets
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
@@ -37,6 +49,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +60,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.antigravity.aod.BuildConfig
 import com.antigravity.aod.ui.theme.RyAccent
 import com.antigravity.aod.ui.theme.RyBackground
 import com.antigravity.aod.ui.theme.RyBorder
@@ -59,6 +75,8 @@ import com.antigravity.aod.ui.theme.RyTextMuted
 import com.antigravity.aod.ui.theme.RyTextPrimary
 import com.antigravity.aod.ui.theme.RyTextSecondary
 import com.antigravity.aod.ui.viewmodel.AodViewModel
+import com.antigravity.aod.updater.GithubRelease
+import com.antigravity.aod.updater.UpdateState
 
 @Composable
 fun SettingsScreen(
@@ -263,6 +281,14 @@ fun SettingsScreen(
                         )
                     }
                 }
+
+                // Setting 6: GitHub Updates & Auto-Installer
+                item {
+                    GithubUpdateCard(
+                        viewModel = viewModel,
+                        currentVersion = BuildConfig.VERSION_NAME
+                    )
+                }
             }
         }
     }
@@ -416,6 +442,365 @@ private fun PermissionStatusCard(
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold
             )
+        }
+    }
+}
+
+@Composable
+private fun GithubUpdateCard(
+    viewModel: AodViewModel,
+    currentVersion: String
+) {
+    val settings by viewModel.settings.collectAsState()
+    val updateState by viewModel.updateState.collectAsState()
+
+    var showAdvancedSettings by remember { mutableStateOf(false) }
+    var tokenInput by remember { mutableStateOf(settings.githubToken) }
+    var repoInput by remember { mutableStateOf(settings.githubRepo) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(RySurfaceVariant)
+            .border(1.dp, RyBorder.copy(alpha = 0.4f), RoundedCornerShape(20.dp))
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(CircleShape)
+                        .background(RyPrimaryContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.CloudDownload,
+                        contentDescription = null,
+                        tint = RyAccent,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        text = "Обновления GitHub",
+                        color = RyTextPrimary,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Версия v$currentVersion • ${settings.githubRepo}",
+                        color = RyTextSecondary,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
+            // Check button
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(RySurfaceElevated)
+                    .clickable(enabled = updateState !is UpdateState.Checking && updateState !is UpdateState.Downloading) {
+                        viewModel.checkForUpdates(currentVersion)
+                    }
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (updateState is UpdateState.Checking) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = RyAccent,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = null,
+                            tint = RyAccent,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "ПРОВЕРИТЬ",
+                            color = RyAccent,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
+
+        // State displays
+        when (val state = updateState) {
+            is UpdateState.UpToDate -> {
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(RyGreen.copy(alpha = 0.12f))
+                        .padding(10.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.CheckCircle,
+                        contentDescription = null,
+                        tint = RyGreen,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "У вас установлена самая актуальная версия v${state.currentVersion}",
+                        color = RyGreen,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+
+            is UpdateState.UpdateAvailable -> {
+                Spacer(modifier = Modifier.height(14.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(RyPrimaryContainer.copy(alpha = 0.4f))
+                        .border(1.dp, RyAccent.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                        .padding(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "🚀 Доступно обновление: ${state.release.tagName}",
+                            color = RyAccent,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (state.release.size > 0) {
+                            Text(
+                                text = "%.1f МБ".format(state.release.size / (1024f * 1024f)),
+                                color = RyTextMuted,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+
+                    if (state.release.body.isNotBlank()) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = state.release.body.take(200),
+                            color = RyTextSecondary,
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Button(
+                        onClick = { viewModel.downloadAndInstall(state.release) },
+                        colors = ButtonDefaults.buttonColors(containerColor = RyAccent),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowDownward,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Скачать и установить",
+                            color = Color.White,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+            }
+
+            is UpdateState.Downloading -> {
+                Spacer(modifier = Modifier.height(12.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(RySurfaceElevated)
+                        .padding(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "Загрузка обновления: ${(state.progress * 100).toInt()}%",
+                            color = RyTextPrimary,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        if (state.totalBytes > 0) {
+                            Text(
+                                text = "%.1f / %.1f МБ".format(
+                                    state.downloadedBytes / (1024f * 1024f),
+                                    state.totalBytes / (1024f * 1024f)
+                                ),
+                                color = RyAccent,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LinearProgressIndicator(
+                        progress = { state.progress },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp)
+                            .clip(CircleShape),
+                        color = RyAccent,
+                        trackColor = RySurfaceVariant
+                    )
+                }
+            }
+
+            is UpdateState.ReadyToInstall -> {
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = { viewModel.installApk(state.apkFile) },
+                    colors = ButtonDefaults.buttonColors(containerColor = RyGreen),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.CheckCircle,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "Установить ${state.release.tagName} (APK готов)",
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                }
+            }
+
+            is UpdateState.Error -> {
+                Spacer(modifier = Modifier.height(12.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(RyOrange.copy(alpha = 0.12f))
+                        .border(1.dp, RyOrange.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                        .padding(10.dp)
+                ) {
+                    Text(
+                        text = state.message,
+                        color = RyOrange,
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp
+                    )
+                }
+            }
+
+            else -> {}
+        }
+
+        // Toggle advanced options (Token & Repo)
+        Spacer(modifier = Modifier.height(10.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showAdvancedSettings = !showAdvancedSettings }
+                .padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Tune,
+                contentDescription = null,
+                tint = RyTextMuted,
+                modifier = Modifier.size(14.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = if (showAdvancedSettings) "Скрыть настройки GitHub" else "Настройки репозитория и токена",
+                color = RyTextMuted,
+                fontSize = 11.sp
+            )
+        }
+
+        if (showAdvancedSettings) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(RySurfaceElevated)
+                    .padding(10.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    value = repoInput,
+                    onValueChange = {
+                        repoInput = it
+                        viewModel.setGithubRepo(it)
+                    },
+                    label = { Text("GitHub репозиторий", fontSize = 11.sp) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = RyTextPrimary,
+                        unfocusedTextColor = RyTextSecondary,
+                        focusedBorderColor = RyAccent,
+                        unfocusedBorderColor = RyBorder
+                    )
+                )
+
+                OutlinedTextField(
+                    value = tokenInput,
+                    onValueChange = {
+                        tokenInput = it
+                        viewModel.setGithubToken(it)
+                    },
+                    label = { Text("GitHub Token (для приватного репо)", fontSize = 11.sp) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = RyTextPrimary,
+                        unfocusedTextColor = RyTextSecondary,
+                        focusedBorderColor = RyAccent,
+                        unfocusedBorderColor = RyBorder
+                    )
+                )
+
+                Text(
+                    text = "Если репозиторий публичный, токен указывать не нужно — обновления скачиваются напрямую.",
+                    color = RyTextMuted,
+                    fontSize = 10.sp,
+                    lineHeight = 14.sp
+                )
+            }
         }
     }
 }

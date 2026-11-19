@@ -14,7 +14,9 @@ data class AodSettings(
     val antiBurnInEnabled: Boolean = true,
     val customBrightness: Float = 0.5f,
     val useSystemBrightness: Boolean = true,
-    val showOnLockScreen: Boolean = false
+    val showOnLockScreen: Boolean = false,
+    val githubToken: String = "",
+    val githubRepo: String = "VibeLandos/aod"
 )
 
 class AodPreferences(context: Context) {
@@ -33,7 +35,9 @@ class AodPreferences(context: Context) {
             antiBurnInEnabled = prefs.getBoolean(KEY_ANTI_BURN_IN, true),
             customBrightness = prefs.getFloat(KEY_BRIGHTNESS, 0.5f),
             useSystemBrightness = prefs.getBoolean(KEY_USE_SYSTEM_BRIGHTNESS, true),
-            showOnLockScreen = prefs.getBoolean(KEY_SHOW_ON_LOCK_SCREEN, false)
+            showOnLockScreen = prefs.getBoolean(KEY_SHOW_ON_LOCK_SCREEN, false),
+            githubToken = prefs.getString(KEY_GITHUB_TOKEN, "") ?: "",
+            githubRepo = prefs.getString(KEY_GITHUB_REPO, "VibeLandos/aod") ?: "VibeLandos/aod"
         )
     }
 
@@ -77,6 +81,16 @@ class AodPreferences(context: Context) {
         _settingsFlow.value = _settingsFlow.value.copy(showOnLockScreen = show)
     }
 
+    fun setGithubToken(token: String) {
+        prefs.edit().putString(KEY_GITHUB_TOKEN, token).apply()
+        _settingsFlow.value = _settingsFlow.value.copy(githubToken = token)
+    }
+
+    fun setGithubRepo(repo: String) {
+        prefs.edit().putString(KEY_GITHUB_REPO, repo).apply()
+        _settingsFlow.value = _settingsFlow.value.copy(githubRepo = repo)
+    }
+
     companion object {
         private const val KEY_KEEP_SCREEN_ON = "key_keep_screen_on"
         private const val KEY_AMOLED_MODE = "key_amoled_mode"
@@ -86,6 +100,8 @@ class AodPreferences(context: Context) {
         private const val KEY_BRIGHTNESS = "key_brightness"
         private const val KEY_USE_SYSTEM_BRIGHTNESS = "key_use_system_brightness"
         private const val KEY_SHOW_ON_LOCK_SCREEN = "key_show_on_lock_screen"
+        private const val KEY_GITHUB_TOKEN = "key_github_token"
+        private const val KEY_GITHUB_REPO = "key_github_repo"
 
         @Volatile
         private var INSTANCE: AodPreferences? = null
